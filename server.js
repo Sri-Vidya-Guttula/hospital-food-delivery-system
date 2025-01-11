@@ -1,30 +1,26 @@
+require('dotenv').config();
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const connectDB = require('./config/mongodb');
+const managerRoutes = require('./routes/managerRoutes');
+const pantryRoutes = require('./routes/pantryRoutes');
+const errorHandler = require('./middlewares/errorHandler');
 
-// Load environment variables
-dotenv.config();
-
-// Initialize Express app
 const app = express();
 
-// Middleware
-app.use(cors());
 app.use(express.json());
-
-// Database Connection (Add your MongoDB connection logic here)
-const connectDB = require('./config/mongodb');
-connectDB();
+app.use(cors());
 
 // Routes
-app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/pantry', require('./routes/pantryRoutes'));
-app.use('/api/delivery', require('./routes/deliveryRoutes'));
+app.use('/api/manager', managerRoutes);
+app.use('/api/pantry', pantryRoutes);
+// app.use('/api/delivery', deliveryRoutes);
 
-// Port configuration
+// Error handler
+app.use(errorHandler);
+
+// Connect to DB
+connectDB();
+
 const PORT = process.env.PORT || 5000;
-
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
